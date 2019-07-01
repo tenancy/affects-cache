@@ -12,12 +12,11 @@
  * @see https://github.com/tenancy
  */
 
-namespace Tenancy\Affects\Cache\Providers;
+namespace Tenancy\Affects\Cache;
 
-use Tenancy\Affects\Cache\Listeners\ConfiguresCache;
 use Tenancy\Support\AffectsProvider;
 
-class ServiceProvider extends AffectsProvider
+class Provider extends AffectsProvider
 {
     protected $affects = [ConfiguresCache::class];
 }

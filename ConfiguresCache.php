@@ -12,41 +12,33 @@
  * @see https://github.com/tenancy
  */
 
-namespace Tenancy\Affects\Cache\Listeners;
+namespace Tenancy\Affects\Cache;
 
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Config\Repository;
-use Tenancy\Affects\Cache\Events\ConfigureCache;
+use Tenancy\Affects\Affect;
 use Tenancy\Concerns\DispatchesEvents;
-use Tenancy\Contracts\TenantAffectsApp;
-use Tenancy\Identification\Events\Switched;
 
-class ConfiguresCache implements TenantAffectsApp
+class ConfiguresCache extends Affect
 {
     use DispatchesEvents;
 
-    /**
-     * @param Switched $event
-     * @return bool|void
-     */
-    public function handle(Switched $event): ?bool
+    public function fire(): void
     {
         /** @var CacheManager $manager¸ */
         $manager = resolve(CacheManager::class);
         /** @var Repository $config */
         $config = resolve(Repository::class);
 
-        if ($event->tenant) {
+        if ($this->event->tenant) {
             $cacheConfig = [];
 
-            $this->events()->dispatch(new ConfigureCache($event, $cacheConfig));
+            $this->events()->dispatch(new Events\ConfigureCache($this->event, $cacheConfig));
         }
 
         $config->set('cache.stores.tenant', $cacheConfig ?? null);
 
         // Force reload of tenant cache driver upon next request.
         $manager->forgetDriver('tenant');
-
-        return null;
     }
 }
